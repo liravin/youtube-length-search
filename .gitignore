@@ -1,5 +1,6 @@
 /shelf/
 /workspace.xml
-.venv
 .idea
 .DS_Store
+.venv
+.env

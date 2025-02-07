@@ -8,21 +8,22 @@ Searches YouTube video with specified duration by YouTube Data API
 
 ## Usage
 
-1. Obtain a YouTube API key: Replace `"YOUR_YOUTUBE_API_KEY"` in the script with your actual YouTube API key. If you don't have one, follow the instructions to create a new API key on the [Google Developer Console](https://console.developers.google.com/).
+1. Obtain a YouTube API key. If you don't have one, follow the instructions to create a new API key on the [Google Developer Console](https://console.developers.google.com/).
 
-2. Command-line arguments:
+2. Create a copy of `.env.example` and name it `.env`. Replace `Your_YouTube_API_Key` in the `.env` file with your actual YouTube API key. 
+
+3. Command-line arguments:
    - `-q` or `--search-query`: Provide your desired search query (e.g., "cat funny").
    - `-m` or `--max-results`: Top m search results. Default: 100
    - `-i` or `--iso-8601`: Specify the target duration in ISO 8601 time format (e.g., PT14M7S).
    - `-s` or `--seconds`: Specify the target duration in seconds (e.g., 411).
    - `-l` or `--list`: Use this option for a list of videos without filtering by duration.
 
-3. Run the script: Execute the script with the desired command-line arguments. For example:
-```
-./youtube-video-length.py -q "cat funny" -i PT5S
-```
+4. Run the script: Execute the script with the desired command-line arguments. For example:
 
-4. Output: The script will display YouTube video titles, IDs, ISO duration, and duration in seconds for videos that match the specified criteria.
+   `python youtube-video-length.py -q "genshin impact full ost" --min-duration PT2H28M12S --max-duration PT2H28M16S`
+
+5. Output: The script will display YouTube video titles, IDs, ISO duration, and duration in seconds for videos that match the specified criteria.
 
 ```mermaid
 flowchart TD

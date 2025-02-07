@@ -4,13 +4,16 @@ Search YouTube videos filtered by duration.
 
 Usage examples:
   - Exact duration (ISO8601):
-      python youtube-video-length.py -k YOUR_API_KEY -q "cat funny" -i PT14M7S
+      python youtube-video-length.py -q "cat funny" -i PT14M7S
   - Exact duration (seconds):
-      python youtube-video-length.py -k YOUR_API_KEY -q "cat funny" -s 411
+      python youtube-video-length.py -q "cat funny" -s 411
   - Interval duration:
-      python youtube-video-length.py -k YOUR_API_KEY -q "cat funny" --min-duration PT30M --max-duration PT40M
+      python youtube-video-length.py -q "cat funny" --min-duration PT30M --max-duration PT40M
   - List without filtering by duration:
-      python youtube-video-length.py -k YOUR_API_KEY -q "cat funny" -l
+      python youtube-video-length.py -q "cat funny" -l
+
+Note:
+  The YouTube API key is loaded from the environment variable YOUTUBE_API_KEY.
 """
 
 import argparse
@@ -18,10 +21,10 @@ import json
 import re
 import sys
 import textwrap
-from functools import reduce
 
 import googleapiclient.discovery
 import googleapiclient.errors
+from environs import Env
 
 
 def iso_time_duration_to_seconds(duration_iso: str) -> int:
@@ -130,8 +133,7 @@ def search_youtube_videos(api_key: str, query: str, max_results: int, mode: str,
     elif mode == 'interval':
         if max_seconds < iso_time_duration_to_seconds("PT4M"):
             video_duration_category = 'short'
-        elif min_seconds >= iso_time_duration_to_seconds("PT4M") and max_seconds < iso_time_duration_to_seconds(
-                "PT20M"):
+        elif min_seconds >= iso_time_duration_to_seconds("PT4M") and max_seconds < iso_time_duration_to_seconds("PT20M"):
             video_duration_category = 'medium'
         elif min_seconds >= iso_time_duration_to_seconds("PT20M"):
             video_duration_category = 'long'
@@ -200,13 +202,12 @@ def parse_args() -> argparse.Namespace:
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
 
-    parser.add_argument('-k', '--api-key', required=True, help='Your YouTube API key')
+    # The API key is no longer passed as a command-line argument.
     parser.add_argument('-q', '--search-query', required=True, help='Search query, e.g. "cat funny"')
     parser.add_argument('-m', '--max-results', type=int, default=100, help='Maximum search results to retrieve')
     parser.add_argument('-t', '--test', action='store_true', help='Test the program with default arguments')
 
     # Mutually exclusive group for exact match or list mode.
-    # (We do not require one here since interval options may be used alone.)
     group = parser.add_mutually_exclusive_group()
     group.add_argument('-i', '--iso-8601', help='Exact duration in ISO8601 format, e.g. PT14M7S')
     group.add_argument('-s', '--seconds', type=int, help='Exact duration in seconds, e.g. 411')
@@ -221,7 +222,8 @@ def parse_args() -> argparse.Namespace:
     # Ensure that at least one duration filtering option is provided.
     if not (args.iso_8601 or args.seconds or args.list or args.min_duration or args.max_duration):
         parser.error(
-            "You must provide one of the following: -i/--iso-8601, -s/--seconds, -l/--list, or --min-duration/--max-duration for an interval filter.")
+            "You must provide one of the following: -i/--iso-8601, -s/--seconds, -l/--list, or --min-duration/--max-duration for an interval filter."
+        )
 
     return args
 
@@ -229,9 +231,16 @@ def parse_args() -> argparse.Namespace:
 def main() -> None:
     args = parse_args()
 
+    # Load API key from environment variable using environs.
+    env = Env()
+    env.read_env()  # Automatically read from a .env file if present.
+    api_key = env("YOUTUBE_API_KEY", None)
+    if not api_key:
+        print("Error: YOUTUBE_API_KEY environment variable not set.", file=sys.stderr)
+        sys.exit(1)
+
     # Test mode: override arguments with test values.
     if args.test:
-        # Note: The API key is still required.
         query = "cat funny"
         mode = "interval"
         try:
@@ -242,7 +251,6 @@ def main() -> None:
             sys.exit(1)
         target_seconds = None
     else:
-        # Determine filtering mode.
         if args.list:
             mode = "list"
         elif args.iso_8601 or args.seconds:
@@ -258,8 +266,7 @@ def main() -> None:
 
         if mode == "exact":
             try:
-                target_seconds = args.seconds if args.seconds is not None else iso_time_duration_to_seconds(
-                    args.iso_8601)
+                target_seconds = args.seconds if args.seconds is not None else iso_time_duration_to_seconds(args.iso_8601)
             except ValueError as e:
                 print(f"Duration parsing error: {e}", file=sys.stderr)
                 sys.exit(1)
@@ -279,7 +286,7 @@ def main() -> None:
         query = args.search_query
 
     search_youtube_videos(
-        api_key=args.api_key,
+        api_key=api_key,
         query=query,
         max_results=args.max_results,
         mode=mode,
