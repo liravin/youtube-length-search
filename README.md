@@ -4,10 +4,6 @@
 
 Searches YouTube video with specified duration by YouTube Data API
 
-## Dependencies
-
-- [google-api-python-client](https://pypi.org/project/google-api-python-client/): Install this package using `pip install google-api-python-client`.
-
 ## Usage
 
 1. Obtain a YouTube API key. If you don't have one, follow the instructions to create a new API key on the [Google Developer Console](https://console.developers.google.com/).
