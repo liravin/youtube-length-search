@@ -1,5 +1,7 @@
 # YouTube Video Length Search
 
+> ☣⚠️ USE AT OWN RISK, CONTAINS LARGE QUANTITIES OF UNREVIEWED CHATGPT CODE ⚠️☣
+
 Searches YouTube video with specified duration by YouTube Data API
 
 ## Dependencies
