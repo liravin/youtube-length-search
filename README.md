@@ -19,7 +19,7 @@ Searches YouTube video with specified duration by YouTube Data API
 
 3. Run the script: Execute the script with the desired command-line arguments. For example:
 ```
-./youtube-video-length-w-key.py -q "cat funny" -i PT5S
+./youtube-video-length.py -q "cat funny" -i PT5S
 ```
 
 4. Output: The script will display YouTube video titles, IDs, ISO duration, and duration in seconds for videos that match the specified criteria.
